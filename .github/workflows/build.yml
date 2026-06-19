@@ -30,21 +30,36 @@ jobs:
         echo "android.useAndroidX=true" >> app/gradle.properties
         echo "rootProject.name = 'DeckFlow'" > app/settings.gradle
     
-    - name: Build APK
+    - name: Install Gradle
+      run: |
+        export JAVA_HOME=$(/usr/libexec/java_home)
+        brew install gradle@8.5
+        /opt/homebrew/opt/gradle@8.5/bin/gradle -v
+    
+    - name: Generate wrapper
       working-directory: app
       run: |
         export JAVA_HOME=$(/usr/libexec/java_home)
-        which gradle || brew install gradle
-        gradle -v
-        gradle assembleDebug 2>&1
+        /opt/homebrew/opt/gradle@8.5/bin/gradle wrapper --gradle-version 8.5
+        ./gradlew -v
+    
+    - name: Build APK
+      working-directory: app
+      env:
+        JAVA_HOME: ${{ steps.setup-java.outputs.java-path }}
+        ANDROID_HOME: ${{ env.ANDROID_HOME }}
+      run: |
+        export JAVA_HOME=$(/usr/libexec/java_home)
+        ./gradlew assembleDebug --stacktrace 2>&1
     
     - name: Check outputs
       run: |
-        find app/build -type f -name "*.apk" -exec ls -lh {} \;
+        ls -la app/build/outputs/apk/debug/ 2>/dev/null || echo "No output dir"
+        find app/build -name "*.apk" 2>/dev/null
     
     - name: Upload APK
-      if: success()
       uses: actions/upload-artifact@v4
       with:
         name: deckflow-apk
         path: app/build/outputs/apk/debug/*.apk
+        retention-days: 7
