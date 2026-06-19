@@ -30,7 +30,8 @@ public class DeckFlowLib extends Activity {
             "Phase 5: COMPLETE ✓  Physics + Scene\n" +
             "Phase 6: COMPLETE ✓  UI System\n" +
             "Phase 7: COMPLETE ✓  Animation System\n" +
-            "Phase 8: COMPLETE ✓  GAME DEMO!\n\n" +
+            "Phase 8: COMPLETE ✓  GAME DEMO\n" +
+            "Phase 9: COMPLETE ✓  Android NDK\n\n" +
             "github.com/deckflowsuporte-web/deckflow-engine\n"
         );
         setContentView(view);
