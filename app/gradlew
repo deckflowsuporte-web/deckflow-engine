@@ -1,0 +1,25 @@
+#!/bin/sh
+#
+# Gradle wrapper script for DeckFlow Engine
+#
+
+# Determine the script directory
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+
+# Gradle wrapper jar location
+WRAPPER_JAR="$SCRIPT_DIR/gradle/wrapper/gradle-wrapper.jar"
+GRADLE_VERSION=8.4
+WRAPPER_URL="https://raw.githubusercontent.com/gradle/gradle/v${GRADLE_VERSION}/gradle/wrapper/gradle-wrapper.jar"
+
+# Download gradle-wrapper.jar if not present
+if [ ! -f "$WRAPPER_JAR" ]; then
+    mkdir -p "$SCRIPT_DIR/gradle/wrapper"
+    echo "Downloading Gradle wrapper..."
+    curl -fsSL "$WRAPPER_URL" -o "$WRAPPER_JAR" || {
+        echo "Failed to download gradle-wrapper.jar"
+        exit 1
+    }
+fi
+
+# Execute Gradle
+exec java -jar "$WRAPPER_JAR" "$@"

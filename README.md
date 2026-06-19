@@ -1,119 +1,224 @@
-# DeckFlow Engine
+# 🎮 DeckFlow Engine
 
-**Mobile-First 2D Game Engine for Android**
+**Motor de jogos 2D mobile-first para Android, inspirado no design da Godot Engine.**
 
-A professional-grade 2D game engine inspired by Godot, designed for game development directly on Android devices.
+[![Build Android APK](https://github.com/deckflowsuporte-web/deckflow-engine/actions/workflows/android.yml/badge.svg)](https://github.com/deckflowsuporte-web/deckflow-engine/actions/workflows/android.yml)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-## Philosophy
+---
 
-**Visual First, Code Optional**
+## 📱 Downloads
 
-Create games using visual tools without writing code. When needed, use Lua for advanced logic.
+| Tipo | Status |
+|------|--------|
+| **Debug APK** | ✅ Build automático via GitHub Actions |
+| **Release APK** | ✅ Build automático via GitHub Actions |
 
-## Features
+### 📥 Download Rápido
 
-- [x] **Node System** - Godot-style entity system
-- [x] **Transform2D** - Position, rotation, scale
-- [x] **Scene Tree** - Hierarchical scene management
-- [x] **Vector2 Math** - Complete 2D vector operations
-- [ ] SDL2 Rendering (Phase 2)
-- [ ] Lua Scripting (Phase 3)
-- [ ] UI Components (Phase 4)
-- [ ] Event System (Phase 5)
-- [ ] Box2D Physics (Phase 6)
-- [ ] Mobile Editor (Phase 7)
-- [ ] APK Export (Phase 8)
+1. Vá em **[Actions](https://github.com/deckflowsuporte-web/deckflow-engine/actions)**
+2. Clique no workflow mais recente
+3. Baixe o APK em **Artifacts**
 
-## Architecture
+---
 
+## 🚀 Funcionalidades
+
+### ✅ Implementado
+
+| Sistema | Descrição |
+|---------|-----------|
+| **Gameplay** | Platformer funcional com física |
+| **Player** | Personagem com controles touch |
+| **Moedas** | Sistema de coleta com pontuação |
+| **Vidas** | 3 vidas com respawn |
+| **Câmera** | Follow suave do player |
+| **Touch Controls** | ◀ ▶ ⬆ botões na tela |
+
+### 🎯 Roadmap
+
+| Fase | Status | Descrição |
+|------|--------|-----------|
+| Phase 1 | ✅ | Scene/Node System |
+| Phase 2 | ✅ | SDL2 Rendering |
+| Phase 3 | ✅ | Box2D Physics |
+| Phase 4 | ✅ | Input, Camera, Audio, Particles |
+| Phase 5 | ✅ | Physics + Scene Integration |
+| Phase 6 | ✅ | UI System |
+| Phase 7 | ✅ | Animation System |
+| Phase 8 | ✅ | **Game Demo - Platformer** |
+| Phase 9 | ✅ | **Android NDK Integration** |
+
+---
+
+## 🕹️ Como Jogar
+
+1. **Instale o APK** no Android
+2. **Abra o app** - O jogo inicia automaticamente
+3. **Controles:**
+   - ◀ = Mover esquerda
+   - ▶ = Mover direita  
+   - ⬆ = Pular
+   - 🔄 = Reiniciar
+
+**Objetivo:** Coletar todas as 5 moedas douradas! 💰
+
+---
+
+## 💻 Desenvolvimento
+
+### Build Local
+
+```bash
+# Clone o repo
+git clone https://github.com/deckflowsuporte-web/deckflow-engine.git
+cd deckflow-engine
+
+# Build APK
+cd app
+./gradlew assembleDebug
+
+# APK em:
+# app/build/outputs/apk/debug/app-debug.apk
 ```
-Scene
-├── Node (Base)
-│   ├── Sprite
-│   ├── Camera2D
-│   ├── RigidBody2D
-│   ├── CollisionShape2D
-│   └── ... (more components)
-└── Node
-```
 
-## Tech Stack
+### Requisitos
 
-| Component | Technology |
-|-----------|------------|
-| Core | C11 |
-| Scripting | Lua |
-| Physics | Box2D |
-| Rendering | SDL2 |
-| Build | CMake |
-| Target | Android |
+- Java 17+
+- Android SDK 34
+- Gradle 8.4+
 
-## Project Structure
+---
+
+## 📂 Estrutura do Projeto
 
 ```
 deckflow-engine/
-├── src/
-│   ├── core/           # Engine core
-│   ├── math/           # Vector2, Transform2D
-│   ├── nodes/          # Node system
-│   ├── scenes/         # Scene management
-│   └── utils/          # Utilities
-├── app/
-│   ├── jni/            # Android NDK
-│   └── src/main/       # Java wrapper
-└── CMakeLists.txt
+├── src/                    # Engine C (multi-plataforma)
+│   ├── math/              # Vector2, Transform2D
+│   ├── nodes/             # Sistema de entidades
+│   ├── scenes/            # Gerenciamento de cenas
+│   ├── physics/           # Box2D integration
+│   ├── input/             # Entrada (touch/teclado)
+│   ├── camera/            # Camera2D
+│   ├── audio/             # Áudio
+│   ├── particle/          # Partículas
+│   ├── tilemap/           # Tile maps
+│   ├── ui/                # UI components
+│   └── animation/         # Animações
+│
+├── app/                   # Wrapper Android
+│   ├── src/main/
+│   │   ├── java/          # Interface Java
+│   │   ├── jni/           # Código nativo Android
+│   │   └── cpp/           # CMake build
+│   └── build.gradle
+│
+├── examples/              # Demos de cada fase
+│   ├── phase1_test/
+│   ├── phase2_sprite/
+│   ├── phase3_physics/
+│   ├── phase4_demo/
+│   ├── phase5_physics/
+│   ├── phase6_ui/
+│   ├── phase7_animation/
+│   └── game_demo/
+│
+├── .github/
+│   └── workflows/
+│       └── android.yml    # CI/CD - Build APK automático
+│
+├── CMakeLists.txt
+└── README.md
 ```
 
-## Build Status
+---
 
-- **Phase 1**: Node System & Transform ✅
-- **Phase 2**: SDL2 Rendering 🚧
-- **Phase 3-8**: In Progress
+## 🔧 CI/CD - GitHub Actions
 
-## Roadmap
+O projeto usa **GitHub Actions** para build automático do APK a cada push.
 
-### Phase 1: Foundation ✅
-- [x] Project structure
-- [x] Node system
-- [x] Transform component
-- [x] Scene management
+```yaml
+# .github/workflows/android.yml
+on:
+  push:
+    branches: [ master, main ]
+  workflow_dispatch:
 
-### Phase 2: Rendering
-- [ ] SDL2 integration
-- [ ] Sprite rendering
-- [ ] Camera2D
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { java-version: '17' }
+      - uses: android-actions/setup-android@v3
+      - run: ./gradlew assembleDebug
+      - uses: actions/upload-artifact@v4
+        with: { path: app/build/outputs/apk/debug/*.apk }
+```
 
-### Phase 3: Scripting
-- [ ] Lua binding
-- [ ] Script component
+---
 
-### Phase 4: UI
-- [ ] Button
-- [ ] Label
-- [ ] Image
-- [ ] Panel
+## 🎨 Screenshots
 
-### Phase 5: Events
-- [ ] Signal system
-- [ ] Event callbacks
+```
+┌────────────────────────────────────┐
+│  🎮 DECKFLOW ENGINE      SCORE: 0 │
+├────────────────────────────────────┤
+│                                    │
+│     🌟                              │
+│   ▓▓▓▓▓         🌟                │
+│          ▓▓▓▓▓                    │
+│   🌟          ▓▓▓▓▓    🌟          │
+│        ▓▓▓▓▓         ▓▓▓▓▓       │
+│                      🌟            │
+│  🟢                      ▓▓▓▓▓     │
+│ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ │
+├────────────────────────────────────┤
+│   [◀]   [▶]   [⬆ JUMP]   [🔄]    │
+└────────────────────────────────────┘
+```
 
-### Phase 6: Physics
-- [ ] Box2D integration
-- [ ] Collision detection
+---
 
-### Phase 7: Editor
-- [ ] Mobile editor UI
-- [ ] Scene editing
-- [ ] Property inspector
+## 📊 Estatísticas
 
-### Phase 8: Export
-- [ ] APK builder
-- [ ] Project export
+| Métrica | Valor |
+|---------|-------|
+| **Linhas de código** | ~6000+ |
+| **Fases implementadas** | 9 |
+| **Exemplos** | 8 |
+| **Plataformas** | Android, Desktop |
+| **Linguagem** | C11 + Java |
 
-## Contributing
+---
 
-This project follows the SPEC.md specification. All changes must align with the defined phases and technology stack.
+## 🤝 Contribuir
 
-## License
+1. Fork o repo
+2. Crie uma branch (`git checkout -b feature/nova-feature`)
+3. Commit (`git commit -m 'Add nova feature'`)
+4. Push (`git push origin feature/nova-feature`)
+5. Abra um Pull Request
 
-MIT License
+---
+
+## 📄 Licença
+
+MIT License - Veja [LICENSE](LICENSE)
+
+---
+
+## 👨‍💻 Autor
+
+**DeckFlow Suporte Web**
+
+- 📧 Email: deckflow.suporte@gmail.com
+- 🌐 GitHub: [deckflowsuporte-web](https://github.com/deckflowsuporte-web)
+
+---
+
+<p align="center">
+  Feito com ❤️ para a comunidade de jogos indie
+</p>
