@@ -7,7 +7,6 @@ on:
 jobs:
   build:
     runs-on: macos-latest
-    timeout-minutes: 15
     steps:
     - uses: actions/checkout@v4
     
@@ -20,46 +19,18 @@ jobs:
     - name: Setup Android SDK
       uses: android-actions/setup-android@v2
     
-    - name: Create local.properties
-      run: echo "sdk.dir=$ANDROID_HOME" > app/local.properties
-    
-    - name: Create Gradle files
-      run: |
-        echo "org.gradle.jvmargs=-Xmx2048m -Dorg.gradle.daemon=false" > app/gradle.properties
-        echo "android.useAndroidX=true" >> app/gradle.properties
-        echo "rootProject.name = 'DeckFlow'" > app/settings.gradle
-    
-    - name: Download Gradle wrapper JAR
-      run: |
-        mkdir -p app/gradle/wrapper
-        curl -sL "https://services.gradle.org/distributions/gradle-8.5-bin.zip" -o /tmp/gradle.zip
-        unzip -q /tmp/gradle.zip -d /tmp/
-        cp /tmp/gradle-8.5/lib/gradle-launcher-8.5.jar app/gradle/wrapper/gradle-wrapper.jar 2>/dev/null || \
-        curl -sL "https://github.com/nicowillis/gradle-wrapper-jar/raw/main/gradle-wrapper.jar" -o app/gradle/wrapper/gradle-wrapper.jar || \
-        echo "Will try system gradle"
-    
     - name: Setup Gradle
-      run: |
-        export JAVA_HOME=$(/usr/libexec/java_home)
-        if [ -f app/gradle/wrapper/gradle-wrapper.jar ]; then
-          echo "distributionUrl=gradle-8.5" > app/gradle/wrapper/gradle-wrapper.properties
-          cat > app/gradlew << 'GRSH'
-#!/bin/bash
-cd "$(dirname "$0")"
-exec java -jar gradle/wrapper/gradle-wrapper.jar "$@"
-GRSH
-          chmod +x app/gradlew
-          ./app/gradlew -v
-        else
-          brew install gradle
-          gradle wrapper --gradle-version 8.5
-        fi
+      run: brew install gradle
     
-    - name: Build
-      working-directory: app
+    - name: Build APK
       run: |
-        export JAVA_HOME=$(/usr/libexec/java_home)
-        ./gradlew assembleDebug 2>&1 || gradle assembleDebug 2>&1
+        cd app
+        echo "sdk.dir=$ANDROID_HOME" > local.properties
+        echo "org.gradle.jvmargs=-Xmx2048m" > gradle.properties
+        echo "android.useAndroidX=true" >> gradle.properties
+        echo "rootProject.name = 'DeckFlow'" > settings.gradle
+        gradle wrapper --gradle-version 8.2
+        ./gradlew assembleDebug --no-daemon 2>&1
     
     - name: Upload APK
       uses: actions/upload-artifact@v4
