@@ -108,7 +108,8 @@ void transform2d_rotate(Transform2D* t, float angle) {
 }
 
 void transform2d_scale_by(Transform2D* t, Vector2 scale) {
-    t->scale = vector2_mul(t->scale, scale);
+    t->scale.x *= scale.x;
+    t->scale.y *= scale.y;
     t->dirty = true;
 }
 

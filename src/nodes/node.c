@@ -254,8 +254,9 @@ Vector2 node_get_global_position(Node* node) {
     if (!node) return vector2_zero();
     
     if (node->parent) {
-        Transform2D parent_xform = node_get_global_transform(node->parent);
-        return transform2d_xform_vector2(parent_xform, node->transform.position);
+        // Add parent position + local position (Godot convention: scale doesn't affect position)
+        Vector2 parent_pos = node_get_global_position(node->parent);
+        return vector2_add(parent_pos, node->transform.position);
     }
     
     return node->transform.position;
@@ -298,7 +299,8 @@ Transform2D node_get_global_transform(Node* node) {
         Transform2D local = node->transform;
         
         Transform2D result;
-        result.position = transform2d_xform_vector2(parent_xform, local.position);
+        // Position: add parent position + child local position (Godot convention)
+        result.position = vector2_add(parent_xform.position, local.position);
         result.rotation = parent_xform.rotation + local.rotation;
         result.scale.x = parent_xform.scale.x * local.scale.x;
         result.scale.y = parent_xform.scale.y * local.scale.y;
