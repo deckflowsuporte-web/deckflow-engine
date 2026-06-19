@@ -1,0 +1,53 @@
+name: Build
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Verify structure
+      run: |
+        echo "=== DeckFlow Engine ==="
+        echo "Checking project structure..."
+        
+        echo "Core files:"
+        ls -la src/core/
+        
+        echo ""
+        echo "Math files:"
+        ls -la src/math/
+        
+        echo ""
+        echo "Node files:"
+        ls -la src/nodes/
+        
+        echo ""
+        echo "Scene files:"
+        ls -la src/scenes/
+        
+        echo ""
+        echo "Android files:"
+        ls -la app/jni/
+        ls -la app/src/main/java/
+        
+        echo ""
+        echo "=== Phase 1 Status ==="
+        echo "[x] Node System"
+        echo "[x] Transform2D"
+        echo "[x] Vector2 Math"
+        echo "[x] Scene Management"
+        echo "[ ] SDL2 Rendering (Phase 2)"
+        echo "[ ] Lua (Phase 3)"
+        echo "[ ] UI (Phase 4)"
+        echo "[ ] Events (Phase 5)"
+        echo "[ ] Box2D (Phase 6)"
+        echo "[ ] Mobile Editor (Phase 7)"
+        echo "[ ] APK Export (Phase 8)"
