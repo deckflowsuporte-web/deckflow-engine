@@ -1,4 +1,8 @@
 buildscript {
+    ext {
+        kotlin_version = '1.9.0'
+        compose_version = '1.5.0'
+    }
     repositories {
         google()
         mavenCentral()
@@ -8,9 +12,14 @@ buildscript {
     }
 }
 
-plugins {
-    id 'com.android.application'
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
 }
+
+apply plugin: 'com.android.application'
 
 android {
     namespace 'com.deckflow.engine'
