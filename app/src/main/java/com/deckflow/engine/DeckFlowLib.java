@@ -22,18 +22,14 @@ public class DeckFlowLib extends Activity {
             "═══════════════════════════════════════════════════\n" +
             "       DECKFLOW ENGINE v1.0.0\n" +
             "═══════════════════════════════════════════════════\n\n" +
-            "Phase 1: COMPLETE ✓\n" +
-            "  ✓ Scene, Node, Hierarchy\n\n" +
-            "Phase 2: COMPLETE ✓\n" +
-            "  ✓ SDL2 + Sprite Rendering\n\n" +
-            "Phase 3: COMPLETE ✓\n" +
-            "  ✓ Box2D Physics\n\n" +
-            "Phase 4: COMPLETE ✓\n" +
-            "  ✓ Input, Camera, Audio, Tilemap, Particles\n\n" +
-            "Phase 5: COMPLETE ✓\n" +
-            "  ✓ Physics + Scene Integration\n" +
-            "  • PhysicsComponent as Node property\n" +
-            "  • Forces, impulses, collision\n\n" +
+            "Phase 1: COMPLETE ✓  Scene, Node, Hierarchy\n" +
+            "Phase 2: COMPLETE ✓  SDL2 + Sprite\n" +
+            "Phase 3: COMPLETE ✓  Box2D Physics\n" +
+            "Phase 4: COMPLETE ✓  Input, Camera, Audio\n" +
+            "         COMPLETE ✓  Tilemap, Particles\n" +
+            "Phase 5: COMPLETE ✓  Physics + Scene\n" +
+            "Phase 6: COMPLETE ✓  UI System\n" +
+            "Phase 7: COMPLETE ✓  Animation System\n\n" +
             "github.com/deckflowsuporte-web/deckflow-engine\n"
         );
         setContentView(view);
