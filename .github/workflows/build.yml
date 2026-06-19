@@ -3,12 +3,11 @@ name: Build
 on:
   push:
     branches: [master]
-  pull_request:
-    branches: [master]
 
 jobs:
   build:
     runs-on: macos-latest
+    timeout-minutes: 15
     steps:
     - uses: actions/checkout@v4
     
@@ -30,36 +29,40 @@ jobs:
         echo "android.useAndroidX=true" >> app/gradle.properties
         echo "rootProject.name = 'DeckFlow'" > app/settings.gradle
     
-    - name: Install Gradle
+    - name: Download Gradle wrapper JAR
+      run: |
+        mkdir -p app/gradle/wrapper
+        curl -sL "https://services.gradle.org/distributions/gradle-8.5-bin.zip" -o /tmp/gradle.zip
+        unzip -q /tmp/gradle.zip -d /tmp/
+        cp /tmp/gradle-8.5/lib/gradle-launcher-8.5.jar app/gradle/wrapper/gradle-wrapper.jar 2>/dev/null || \
+        curl -sL "https://github.com/nicowillis/gradle-wrapper-jar/raw/main/gradle-wrapper.jar" -o app/gradle/wrapper/gradle-wrapper.jar || \
+        echo "Will try system gradle"
+    
+    - name: Setup Gradle
       run: |
         export JAVA_HOME=$(/usr/libexec/java_home)
-        brew install gradle@8.5
-        /opt/homebrew/opt/gradle@8.5/bin/gradle -v
+        if [ -f app/gradle/wrapper/gradle-wrapper.jar ]; then
+          echo "distributionUrl=gradle-8.5" > app/gradle/wrapper/gradle-wrapper.properties
+          cat > app/gradlew << 'GRSH'
+#!/bin/bash
+cd "$(dirname "$0")"
+exec java -jar gradle/wrapper/gradle-wrapper.jar "$@"
+GRSH
+          chmod +x app/gradlew
+          ./app/gradlew -v
+        else
+          brew install gradle
+          gradle wrapper --gradle-version 8.5
+        fi
     
-    - name: Generate wrapper
+    - name: Build
       working-directory: app
       run: |
         export JAVA_HOME=$(/usr/libexec/java_home)
-        /opt/homebrew/opt/gradle@8.5/bin/gradle wrapper --gradle-version 8.5
-        ./gradlew -v
-    
-    - name: Build APK
-      working-directory: app
-      env:
-        JAVA_HOME: ${{ steps.setup-java.outputs.java-path }}
-        ANDROID_HOME: ${{ env.ANDROID_HOME }}
-      run: |
-        export JAVA_HOME=$(/usr/libexec/java_home)
-        ./gradlew assembleDebug --stacktrace 2>&1
-    
-    - name: Check outputs
-      run: |
-        ls -la app/build/outputs/apk/debug/ 2>/dev/null || echo "No output dir"
-        find app/build -name "*.apk" 2>/dev/null
+        ./gradlew assembleDebug 2>&1 || gradle assembleDebug 2>&1
     
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
         name: deckflow-apk
         path: app/build/outputs/apk/debug/*.apk
-        retention-days: 7
