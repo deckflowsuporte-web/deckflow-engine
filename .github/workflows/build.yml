@@ -8,35 +8,52 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-    container: ghcr.io/nicowillis/android-sdk:2024.1
+    runs-on: macos-latest
     steps:
     - uses: actions/checkout@v4
+    
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+    
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v2
     
     - name: Create local.properties
       run: echo "sdk.dir=$ANDROID_HOME" > app/local.properties
     
-    - name: Create gradle.properties
+    - name: Create Gradle files
       run: |
         echo "org.gradle.jvmargs=-Xmx2048m" > app/gradle.properties
         echo "android.useAndroidX=true" >> app/gradle.properties
-    
-    - name: Setup Gradle
-      run: |
-        export ANDROID_HOME=/opt/android-sdk
-        export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
         echo "rootProject.name = 'DeckFlow'" > app/settings.gradle
-        gradle wrapper --gradle-version 8.2 2>&1
+    
+    - name: Setup Gradle wrapper
+      working-directory: app
+      run: |
+        mkdir -p gradle/wrapper
+        curl -L -o gradle/wrapper/gradle-wrapper.jar "https://github.com/gradle/gradle/raw/v8.2.0/gradle/wrapper/gradle-wrapper.jar"
+        echo "distributionBase=GRADLE_USER_HOME" > gradle/wrapper/gradle-wrapper.properties
+        echo "distributionPath=wrapper/dists" >> gradle/wrapper/gradle-wrapper.properties
+        echo "distributionUrl=https\\://services.gradle.org/distributions/gradle-8.2-bin.zip" >> gradle/wrapper/gradle-wrapper.properties
+        echo "networkTimeout=10000" >> gradle/wrapper/gradle-wrapper.properties
+        echo "zipStoreBase=GRADLE_USER_HOME" >> gradle/wrapper/gradle-wrapper.properties
+        echo "zipStorePath=wrapper/dists" >> gradle/wrapper/gradle-wrapper.properties
+        echo '#!/bin/sh' > gradlew
+        echo 'exec java -jar "$(dirname "$0")/gradle/wrapper/gradle-wrapper.jar" "$@"' >> gradlew
+        chmod +x gradlew
     
     - name: Build APK
       working-directory: app
-      env:
-        ANDROID_HOME: /opt/android-sdk
-        JAVA_HOME: /usr/lib/jvm/java-17-openjdk-amd64
       run: |
-        ./gradlew assembleDebug --no-daemon 2>&1
+        mkdir -p ~/.gradle
+        echo "org.gradle.jvmargs=-Xmx2048m" >> ~/.gradle/gradle.properties
+        ./gradlew assembleDebug --no-daemon --stacktrace 2>&1 | tail -100
     
     - name: Upload APK
+      if: success()
       uses: actions/upload-artifact@v4
       with:
         name: deckflow-apk
