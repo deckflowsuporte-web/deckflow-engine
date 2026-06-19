@@ -1,0 +1,9 @@
+# Dependencies (build manually)
+box2d/
+SDL2/
+
+# Build artifacts
+build/
+*.o
+*.a
+phase3_physics
