@@ -28,6 +28,12 @@
 #include "tilemap/tilemap.h"
 #include "particle/particle.h"
 
+// Phase 5 Physics
+#include "physics/physics.h"
+
+// Phase 6 UI
+#include "ui/ui.h"
+
 // Version
 #define DECKFLOW_VERSION_MAJOR 1
 #define DECKFLOW_VERSION_MINOR 0
