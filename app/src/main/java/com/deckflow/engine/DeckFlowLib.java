@@ -14,23 +14,26 @@ public class DeckFlowLib extends Activity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         
         TextView view = new TextView(this);
-        view.setTextSize(16);
+        view.setTextSize(14);
         view.setTextColor(Color.WHITE);
         view.setBackgroundColor(Color.rgb(26, 26, 46));
-        view.setPadding(40, 40, 40, 40);
+        view.setPadding(30, 30, 30, 30);
         view.setText(
             "═══════════════════════════════════════════════════\n" +
-            "        DECKFLOW ENGINE v1.0.0\n" +
+            "       DECKFLOW ENGINE v1.0.0\n" +
             "═══════════════════════════════════════════════════\n\n" +
             "Phase 1: COMPLETE ✓\n" +
             "  ✓ Scene, Node, Hierarchy (60 tests)\n\n" +
             "Phase 2: COMPLETE ✓\n" +
-            "  ✓ SDL2 + Sprite Rendering\n" +
-            "  • examples/phase2_sprite/main.c\n\n" +
+            "  ✓ SDL2 + Sprite Rendering\n\n" +
             "Phase 3: COMPLETE ✓\n" +
-            "  ✓ Box2D Physics Integration\n" +
-            "  • examples/phase3_physics/main.c\n" +
-            "  • Gravity, collisions, rigid bodies\n\n" +
+            "  ✓ Box2D Physics Integration\n\n" +
+            "Phase 4: COMPLETE ✓\n" +
+            "  ✓ Input System (keyboard, mouse, touch)\n" +
+            "  ✓ Camera System (follow, zoom, shake)\n" +
+            "  ✓ Audio System (music, SFX)\n" +
+            "  ✓ Tilemap System (tiles, layers)\n" +
+            "  ✓ Particle System (fire, smoke, effects)\n\n" +
             "github.com/deckflowsuporte-web/deckflow-engine\n"
         );
         setContentView(view);
