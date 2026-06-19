@@ -6,7 +6,7 @@ on:
 
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
     
@@ -17,20 +17,35 @@ jobs:
         distribution: 'temurin'
     
     - name: Setup Android SDK
-      uses: android-actions/setup-android@v2
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y wget unzip
+        mkdir -p /opt/android-sdk/cmdline-tools
+        cd /tmp
+        wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
+        unzip -q commandlinetools-linux-11076708_latest.zip
+        mv cmdline-tools /opt/android-sdk/cmdline-tools/latest
+        yes | /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=/opt/android-sdk "platform-tools" "platforms;android-34" "build-tools;34.0.0" 2>/dev/null || true
+        echo "sdk.dir=/opt/android-sdk" > app/local.properties
     
     - name: Setup Gradle
-      run: brew install gradle
+      run: |
+        mkdir -p /opt/gradle
+        cd /tmp
+        wget -q https://services.gradle.org/distributions/gradle-8.5-bin.zip
+        unzip -q gradle-8.5-bin.zip
+        mv gradle-8.5 /opt/gradle
+        echo "org.gradle.jvmargs=-Xmx2048m" > app/gradle.properties
+        echo "android.useAndroidX=true" >> app/gradle.properties
+        echo "rootProject.name = 'DeckFlow'" > app/settings.gradle
     
     - name: Build APK
+      working-directory: app
+      env:
+        JAVA_HOME: /usr/lib/jvm/java-17-openjdk-amd64
+        ANDROID_HOME: /opt/android-sdk
       run: |
-        cd app
-        echo "sdk.dir=$ANDROID_HOME" > local.properties
-        echo "org.gradle.jvmargs=-Xmx2048m" > gradle.properties
-        echo "android.useAndroidX=true" >> gradle.properties
-        echo "rootProject.name = 'DeckFlow'" > settings.gradle
-        gradle wrapper --gradle-version 8.2
-        ./gradlew assembleDebug --no-daemon 2>&1
+        /opt/gradle/gradle-8.5/bin/gradle assembleDebug --no-daemon 2>&1
     
     - name: Upload APK
       uses: actions/upload-artifact@v4
