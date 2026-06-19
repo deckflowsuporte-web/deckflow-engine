@@ -13,7 +13,7 @@ import android.content.pm.ActivityInfo;
 public class DeckFlowLib extends Activity {
     
     static {
-        System.loadLibrary("deckflow");
+        System.loadLibrary("native-lib");
     }
     
     // Native methods
