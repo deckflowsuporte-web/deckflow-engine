@@ -16,6 +16,7 @@
 // Forward declarations
 typedef struct Scene Scene;
 typedef struct Node Node;
+typedef struct PhysicsComponent PhysicsComponent;
 
 // Node type identifiers
 typedef enum NodeType {
@@ -106,6 +107,9 @@ struct Node {
     // User data
     void* user_data;
     void (*user_data_destructor)(void*);
+    
+    // Physics component (attached if not NULL)
+    PhysicsComponent* physics_component;
 };
 
 // Node lifecycle
