@@ -6,27 +6,13 @@ on:
   pull_request:
     branches: [master]
 
-env:
-  ANDROID_COMPILE_SDK: 34
-
 jobs:
-  # Job 1: Verificar estrutura
-  verify:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - name: Verify structure
-      run: |
-        echo "=== DeckFlow Engine Structure ==="
-        find . -type f \( -name "*.c" -o -name "*.h" -o -name "*.java" \) | sort
-
-  # Job 2: Build Android APK
-  build-android:
+  build:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
     
-    - name: Setup Java
+    - name: Setup Java 17
       uses: actions/setup-java@v4
       with:
         java-version: '17'
@@ -36,185 +22,25 @@ jobs:
       uses: android-actions/setup-android@v2
     
     - name: Create local.properties
-      run: |
-        echo "sdk.dir=$ANDROID_HOME" > app/local.properties
-    
-    - name: Create gradle wrapper
-      working-directory: app
-      run: |
-        touch settings.gradle
-        gradle wrapper --gradle-version 8.2
+      run: echo "sdk.dir=$ANDROID_HOME" > app/local.properties
     
     - name: Create gradle.properties
       run: |
         echo "org.gradle.jvmargs=-Xmx2048m" > app/gradle.properties
         echo "android.useAndroidX=true" >> app/gradle.properties
-        echo "android.nonTransitiveRClass=true" >> app/gradle.properties
     
-    - name: Create build.gradle
+    - name: Create gradle wrapper
+      working-directory: app
       run: |
-        cat > app/build.gradle << 'BUILDEOF'
-plugins {
-    id 'com.android.application'
-}
-
-android {
-    namespace 'com.deckflow.engine'
-    compileSdk 34
-
-    defaultConfig {
-        applicationId "com.deckflow.engine"
-        minSdk 21
-        targetSdk 34
-        versionCode 1
-        versionName "1.0.0"
-    }
-
-    buildTypes {
-        debug { minifyEnabled false }
-        release { minifyEnabled false }
-    }
-
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
-    }
-
-    lint { abortOnError false }
-}
-
-dependencies {
-    implementation 'androidx.appcompat:appcompat:1.6.1'
-}
-BUILDEOF
-    
-    - name: Create AndroidManifest
-      run: |
-        cat > app/src/main/AndroidManifest.xml << 'XMLEOF'
-<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
-    <application android:label="DeckFlow" android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
-        <activity android:name=".DeckFlowLib" android:exported="true" android:screenOrientation="landscape">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
-        </activity>
-    </application>
-</manifest>
-XMLEOF
-    
-    - name: Create simple C wrapper (no SDL dependency for Phase 1)
-      run: |
-        cat > app/src/main/cpp/native-lib.cpp << 'CEOF'
-#include <jni.h>
-#include <android/log.h>
-
-#define LOG_TAG "DeckFlow"
-#define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
-
-extern "C" {
-    JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void*) {
-        LOGI("DeckFlow JNI loaded");
-        return JNI_VERSION_1_6;
-    }
-    
-    JNIEXPORT void JNICALL Java_com_deckflow_engine_DeckFlowLib_nativeInit(JNIEnv*, jobject) {
-        LOGI("============================================");
-        LOGI("   DECKFLOW ENGINE v1.0.0");
-        LOGI("   Mobile-First 2D Game Engine");
-        LOGI("   Godot-inspired Architecture");
-        LOGI("============================================");
-        LOGI("");
-        LOGI("[Phase 1] COMPLETE:");
-        LOGI("- Vector2 Math System");
-        LOGI("- Transform2D System");
-        LOGI("- Node System (Godot-style)");
-        LOGI("- Scene Management");
-        LOGI("");
-        LOGI("[Phase 2] SDL2 Rendering: PENDING");
-    }
-    
-    JNIEXPORT void JNICALL Java_com_deckflow_engine_DeckFlowLib_nativeDestroy(JNIEnv*, jobject) {
-        LOGI("DeckFlow shutdown complete");
-    }
-}
-CEOF
-    
-    - name: Update CMakeLists
-      run: |
-        cat > app/src/main/cpp/CMakeLists.txt << 'CMAKEOF'
-cmake_minimum_required(VERSION 3.18.1)
-add_library(native-lib SHARED native-lib.cpp)
-target_link_libraries(native-lib android log)
-CMAKEOF
-    
-    - name: Update build.gradle with CMake
-      run: |
-        cat > app/build.gradle << 'BUILDEOF'
-plugins {
-    id 'com.android.application'
-}
-
-android {
-    namespace 'com.deckflow.engine'
-    compileSdk 34
-
-    defaultConfig {
-        applicationId "com.deckflow.engine"
-        minSdk 21
-        targetSdk 34
-        versionCode 1
-        versionName "1.0.0"
-        
-        externalNativeBuild {
-            cmake {
-                path "src/main/cpp/CMakeLists.txt"
-                version "3.22.1"
-            }
-        }
-        
-        ndk {
-            abiFilters 'armeabi-v7a', 'arm64-v8a'
-        }
-    }
-
-    buildTypes {
-        debug { minifyEnabled false }
-    }
-
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
-    }
-
-    lint { abortOnError false }
-}
-
-dependencies {
-    implementation 'androidx.appcompat:appcompat:1.6.1'
-}
-BUILDEOF
-    
-    - name: Setup NDK
-      run: |
-        mkdir -p $ANDROID_HOME/ndk
-        echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "ndk;25.2.3356530" 2>/dev/null || true
+        touch settings.gradle
+        gradle wrapper --gradle-version 8.2 2>&1 || echo "Wrapper may exist"
     
     - name: Build APK
       working-directory: app
-      run: |
-        ./gradlew assembleDebug --no-daemon 2>&1 | tail -50
-    
-    - name: Check APK
-      run: |
-        echo ""
-        echo "=== APK Files ==="
-        find app/build -name "*.apk" -exec ls -lh {} \;
+      run: ./gradlew assembleDebug --no-daemon 2>&1
     
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
-        name: deckflow-debug-apk
+        name: deckflow-apk
         path: app/build/outputs/apk/debug/*.apk
-        retention-days: 30
